@@ -3,6 +3,7 @@ Webhook for Azure alerts to create issue in Redmine automatically.
 
 ## Installation
 On the the (Redmine) server (Azure VM):
+
 1. Create a `/var/www/html/alert` folder
 2. Copy the index.php into the new folder
 3. Configure Azure alert webhook to `http://<server-name or IP>/alert`
