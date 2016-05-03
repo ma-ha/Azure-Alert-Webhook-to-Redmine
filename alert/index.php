@@ -5,11 +5,32 @@
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	$data = json_decode( file_get_contents('php://input'), true );
-	echo '{"context":"'.$data['status'].'"}';
-	// TODO
+	var_dump( $data );
+	
+	if ( $data['status'] == 'Activated' ) {
+		$issue = array();
+		$project_id = 1;
+		if ( isset( $_GET['project_id'] ) ) {
+			$project_id = $_GET['project_id'];
+		}
+		$issue['issue'] = array(
+				"project_id" => $project_id,
+				"tracker_id" => 1,
+				"status_id"  => 1,
+				"subject"    => $data['context']['resourceName'].': '.$data['context']['name'].' (Alert)',
+				"description"=> file_get_contents('php://input'),
+				"priority_id"=> 4
+		);
+		echo json_encode( $issue , JSON_PRETTY_PRINT ); 
+	} else {
+		error_log( "hmmmm" );
+	} 
 } else {
+	error_log( "grrrr" );
+	
 	// redirect .... forgotten / at end of URL?
 }
+
 /* Redmine: Create Issue
  POST: https://ddd-dynop-redmine.cloudapp.net/redmine/issues.json
 Content-Type: application/json
@@ -19,6 +40,7 @@ Content-Type: application/json
     "tracker_id": 1,
     "status_id": 1,
     "subject": "Example",
+    "description":"......."
     "priority_id": 4,
     "custom_fields":[{"id":1, "value":"PrM (PoC)"}]
   }
