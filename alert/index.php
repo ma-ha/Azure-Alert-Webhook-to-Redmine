@@ -1,13 +1,15 @@
 <?php
 // Copyright M. Harms 2016 (MIT License). All rights reserved.
- 
-// header('Content-type: application/json');
-
+$redmineURL = 'http://<redmine-user>:<redmine-password>@<redmine-base-url>/issues.json';
+		
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+	
 	$data = json_decode( file_get_contents('php://input'), true );
-	var_dump( $data );
+	// var_dump( $data );
 	
 	if ( $data['status'] == 'Activated' ) {
+		
+		// construct "issue" data structure for Redmine "create issue" API 
 		$issue = array();
 		$project_id = 1;
 		if ( isset( $_GET['project_id'] ) ) {
@@ -18,36 +20,37 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 				"tracker_id" => 1,
 				"status_id"  => 1,
 				"subject"    => $data['context']['resourceName'].': '.$data['context']['name'].' (Alert)',
-				"description"=> file_get_contents('php://input'),
+				"description"=> "",//file_get_contents('php://input'),
 				"priority_id"=> 4
 		);
-		echo json_encode( $issue , JSON_PRETTY_PRINT ); 
+		$data_string = json_encode( $issue ); 
+		error_log( $data_string );
+		// set up POST request to Redmine
+		$creIssue = curl_init( $redmineURL );
+		curl_setopt( $creIssue, CURLOPT_CUSTOMREQUEST, "POST" );
+		curl_setopt( $creIssue, CURLOPT_POSTFIELDS, $data_string );
+		curl_setopt( $creIssue, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $creIssue, CURLOPT_HTTPHEADER, array(
+				'Content-Type: application/json',
+				'Content-Length: ' . strlen( $data_string ) )
+			);
+		$result = curl_exec( $creIssue );
+		
+		header('Content-type: application/json');
+		echo "{ \"status\": \"$result\" }";
+		
 	} else {
+		echo '{ "status":"'.$data['status'].'", "error":"Status not Activted" }';
 		error_log( "hmmmm" );
 	} 
 } else {
-	error_log( "grrrr" );
-	
-	// redirect .... forgotten / at end of URL?
+	error_log( "No POST call! -- Redirect?? Forgotten / at end of URL? " );
 }
+	
+/* 
+Sample Azure Alert: 
+from MS docu https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/
 
-/* Redmine: Create Issue
- POST: https://ddd-dynop-redmine.cloudapp.net/redmine/issues.json
-Content-Type: application/json
-{
-  "issue": {
-    "project_id": 1,
-    "tracker_id": 1,
-    "status_id": 1,
-    "subject": "Example",
-    "description":"......."
-    "priority_id": 4,
-    "custom_fields":[{"id":1, "value":"PrM (PoC)"}]
-  }
-}
- */
-	
-/* sample alert from MS docu https://azure.microsoft.com/en-us/documentation/articles/insights-webhooks-alerts/
  {
 	"status": "Activated",
 	"context": {
@@ -71,13 +74,28 @@ Content-Type: application/json
 	            "resourceType": "microsoft.foo/sites",
 	            "resourceId": "/subscriptions/s1/resourceGroups/useast/providers/microsoft.foo/sites/mysite1",
 	            "resourceRegion": "centralus",
-	            "portalLink": "https://portal.azure.com/#resource/subscriptions/s1/resourceGroups/useast/providers/microsoft.foo/sites/mysite1”                                
+	            "portalLink": "https://portal.azure.com/#resource/subscriptions/s1/resourceGroups/useast/providers/microsoft.foo/sites/mysite1"                                
 	},
 	"properties": {
 	              "key1": "value1",
 	              "key2": "value2"
 	              }
 }
+
+Redmine: Create Issue
+  POST: https://xyz-vm.cloudapp.net/redmine/issues.json
+  Content-Type: application/json
+	{
+	  "issue": {
+	    "project_id": 1,
+	    "tracker_id": 1,
+	    "status_id": 1,
+	    "subject": "Example",
+	    "description":"......."
+	    "priority_id": 4,
+	    "custom_fields":[{"id":1, "value":"abc"}]
+	  }
+	}
  */
 
 ?>
