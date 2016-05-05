@@ -1,8 +1,27 @@
 <?php
 // Copyright M. Harms 2016 (MIT License). All rights reserved.
+
+// TODO: specify Redmine URL
 $redmineURL = 'http://<redmine-user>:<redmine-password>@<redmine-base-url>/issues.json';
-		
+
+// Optional: Define a token for simple authentication:
+$token  = ''; 
+
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+	
+	if ( $token != '' ) {
+		if ( isset( $_GET['token'] ) ) {
+			if ( $_GET['token'] != $token ) {
+				header('HTTP/1.0 401 Unauthorized');
+				error_log( 'Token invalid!');
+				exit;
+			}
+		} else {
+			header('HTTP/1.0 401 Unauthorized');
+			error_log( 'Token required!');
+			exit;
+		}
+	}
 	
 	$data = json_decode( file_get_contents('php://input'), true );
 	// var_dump( $data );
@@ -40,8 +59,8 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 		echo "{ \"status\": \"$result\" }";
 		
 	} else {
-		echo '{ "status":"'.$data['status'].'", "error":"Status not Activted" }';
-		error_log( "hmmmm" );
+		echo '{ "status":"'.$data['status'].'", "error":"Status not Activted. Nothing to do!" }';
+		error_log( "Status '".$data['status']."' not 'Activted'. Nothing to do!" );
 	} 
 } else {
 	error_log( "No POST call! -- Redirect?? Forgotten / at end of URL? " );
