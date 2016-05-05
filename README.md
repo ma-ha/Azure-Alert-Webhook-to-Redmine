@@ -1,12 +1,15 @@
 # AzureAlert-Webhook-to-Redmine
-Webhook for Azure alerts to create issue in Redmine automatically.
+Webhook for Microsoft Azure alerts to create issue (bug) in Redmine automatically.
 
 ## Installation
 On the the (Redmine) server (Azure VM):
 
 1. Create a `/var/www/html/alert` folder
-2. Copy the index.php into the new folder
-3. Configure Azure alert webhook to `http://<server-name or IP>/alert/`
+2. Copy the alert/index.php into the new folder
+3. Configure the `$redmineURL`to your needs 
+4. Configure Azure alert webhook to `http://<redmine-server-name or IP>/alert/`
+
+I recommend to configure a DNS name in Azure for the Redmine server endpoint, so you don't need a static IP.
 
 Test it with _curl_ or _REST easy_ :
 
@@ -43,3 +46,23 @@ Test it with _curl_ or _REST easy_ :
 		              "key2": "value2"
 		              }
 	}
+
+## Options
+### Token authentication
+In alert/index.php insert a token string, eg 
+
+	...
+	// Optional: Define a token for simple authentication:
+	$token  = 'abcdefg'; // ouch, not very secure
+	... 
+
+To ahutenticate uning this token, you need to add an URL parameter in the Azure web hook URL 
+The web hook should look now this way `http://<server>/alert/?token=abcdefg`
+
+### Specify project_id
+Issues are created within the first project (project_id=1) by default. 
+If you have to create the issue in a different project, 
+you can easily do that by adding the _project_id_ as URL parameter in the web hook, e.g.
+`http://<server>/alert/?token=abcdefg&project_id=2`
+
+Advice: You can get the project id via the [http://www.redmine.org/projects/redmine/wiki/Rest_Projects](Redmine API)

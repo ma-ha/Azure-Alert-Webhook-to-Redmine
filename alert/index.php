@@ -2,7 +2,9 @@
 // Copyright M. Harms 2016 (MIT License). All rights reserved.
 
 // TODO: specify Redmine URL
-$redmineURL = 'http://<redmine-user>:<redmine-password>@<redmine-base-url>/issues.json';
+$redmineURL =  'http://<redmine-base-url>/issues.json';
+// or e.g.:
+// $redmineURL = 'https://<redmine-user>:<redmine-password>@<redmine-base-url>/issues.json';
 
 // Optional: Define a token for simple authentication:
 $token  = ''; 
