@@ -56,7 +56,7 @@ In alert/index.php insert a token string, eg
 	$token  = 'abcdefg'; // ouch, not very secure
 	... 
 
-To ahutenticate uning this token, you need to add an URL parameter in the Azure web hook URL 
+To authenticate using this token, you need to add an URL parameter in the Azure web hook URL.
 The web hook should look now this way `http://<server>/alert/?token=abcdefg`
 
 ### Specify project_id
