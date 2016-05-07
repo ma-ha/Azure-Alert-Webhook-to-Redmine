@@ -1,8 +1,11 @@
 # AzureAlert-Webhook-to-Redmine
 Webhook for Microsoft Azure alerts to create issue (bug) in Redmine automatically.
 
+Requirements: You need an PHP enabled web server. 
+I use an Azure VM with Ubuntu 16.04 LTS, Apache 2.4.18 and PHP 7.0.4.
+
 ## Installation
-It's easy and can be done in 3 min.
+It's easy and can be done in 3 min. 
 
 On the the (Redmine) server (Azure VM):
 
